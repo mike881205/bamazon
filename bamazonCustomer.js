@@ -19,50 +19,190 @@ connection.connect(function (err) {
     start();
 });
 
+let cart = []
+let cartTotal = 0
+
+
+
 function start() {
 
-    connection.query("SELECT * FROM products", function (err, results) {
+    console.log("")
+    console.log("Welcome to Bamazon!")
+    console.log("")
+    console.log("Items in Cart: " + cart.length + " | " + "Cart Total: " + "$" + cartTotal)
+    console.log("")
+
+    inquirer
+        .prompt({
+            name: "dpt_list",
+            type: "rawlist",
+            choices: ["Electronics", "Hardware", "Games/Toys", "Sporting Goods", "Exit"],
+            message: "Please select a department to view items"
+        })
+        .then(function (dept) {
+            let department = dept.dpt_list
+            switch (department) {
+                case "Electronics":
+                    deptMenu();
+                    break;
+                case "Hardware":
+                    deptMenu();
+                    break;
+                case "Games/Toys":
+                    deptMenu();
+                    break;
+                case "Sporting Goods":
+                    deptMenu();
+                    break;
+                case "Exit":
+                    console.log("Thank You for Coming! See You Soon!")
+                    connection.end();
+                    break;
+            }
+
+            function deptMenu() {
+
+                console.log("")
+                console.log("Items in Cart: " + cart.length + " | " + "Cart Total: " + "$" + cartTotal)
+                console.log("")
+
+                connection.query("SELECT * FROM products WHERE department=?", [department], function (err, results) {
+                    if (err) throw err;
+
+                    inquirer
+                        .prompt(
+                            {
+                                name: "choice",
+                                type: "rawlist",
+                                choices: function () {
+                                    let choiceArray = []
+                                    for (let i = 0; i < results.length; i++) {
+                                        choiceArray.push(results[i].product + " | " + "$" + results[i].price + " | " + "Available: " + results[i].stock)
+                                    }
+                                    choiceArray.push("Return")
+                                    return choiceArray
+                                },
+                                message: "What would you like to purchase?"
+                            }
+                        )
+                        .then(function (itemChoice) {
+
+                            let product = itemChoice.choice.split(" | ")[0]
+                            let price = parseInt(itemChoice.choice.split(" | ")[1].split("$")[1])
+
+                            if (product == "Return") {
+                                start()
+                            }
+                            else {
+                                cartPrompt()
+                            }
+
+                            function cartPrompt() {
+
+                                inquirer.prompt(
+                                    {
+                                        name: "prompt",
+                                        type: "list",
+                                        message: "Are you sure you want to add this item?",
+                                        choices: ["Yes", "No"]
+                                    }
+                                )
+                                    .then(function (answer) {
+
+                                        if (answer.prompt === "Yes") {
+
+                                            cart.push(product)
+                                            cartTotal = cartTotal + price
+
+                                            console.log("")
+                                            console.log("Item added to cart!")
+                                            start()
+
+                                        }
+                                        else {
+                                            connection.end();
+                                        }
+                                    })
+
+                            }
+
+                        })
+
+                })
+
+            }
+
+        })
+
+}
+
+// ======================================================================
+// Electronics
+// ======================================================================
+
+function electronics() {
+
+    console.log("")
+    console.log("Items in Cart: " + cart.length + " | " + "Cart Total: " + "$" + cartTotal)
+    console.log("")
+
+    connection.query("SELECT * FROM products WHERE department=?", ["Electronics"], function (err, results) {
         if (err) throw err;
 
-        console.log("")
-        console.log("Welcome to Bamazon!")
-        console.log("")
         inquirer
-            .prompt({
-                name: "dpt_list",
-                type: "rawlist",
-                choices: ["Electronics", "Hardware", "Games/Toys", "Sporting Goods", "Exit"],
-                // choices: function () {
-                //     let productArray = [];
-                //     for (let i = 0; i < results.length; i++) {
-                //         productArray.push(results[i].department);
-                //     }
-                //     return productArray
-                // },
-                message: "Please select a department"
-            })
-            .then(function (dept) {
-                let department = dept.dpt_list
-                switch (department) {
-                    case "Electronics":
-                        // electronics();
-                        console.log("Under Construction")
-                        connection.end();
-                        break;
-                    case "Hardware":
-                        // hardware();
-                        console.log("Under Construction")
-                        connection.end();
-                        break;
-                    case "Games/Toys":
-                        // gamesToys();
-                        console.log("Under Construction")
-                        connection.end();
-                        break;
-                    case "Exit":
-                        console.log("Thank You for Coming! See You Soon!")
-                        connection.end();
-                        break;
+            .prompt(
+                {
+                    name: "choice",
+                    type: "rawlist",
+                    choices: function () {
+                        let choiceArray = []
+                        for (let i = 0; i < results.length; i++) {
+                            choiceArray.push(results[i].product + " | " + "$" + results[i].price + " | " + "Available: " + results[i].stock)
+                        }
+                        choiceArray.push("Return")
+                        return choiceArray
+                    },
+                    message: "What would you like to purchase?"
+                }
+            )
+            .then(function (itemChoice) {
+
+                let product = itemChoice.choice.split(" | ")[0]
+                let price = parseInt(itemChoice.choice.split(" | ")[1].split("$")[1])
+
+                if (product == "Return") {
+                    start()
+                }
+                else {
+                    cartPrompt()
+                }
+
+                function cartPrompt() {
+
+                    inquirer.prompt(
+                        {
+                            name: "prompt",
+                            type: "list",
+                            message: "Are you sure you want to add this item?",
+                            choices: ["Yes", "No"]
+                        }
+                    )
+                        .then(function (answer) {
+
+                            if (answer.prompt === "Yes") {
+
+                                cart.push(product)
+                                cartTotal = cartTotal + price
+
+                                console.log("")
+                                console.log("Item added to cart!")
+                                start()
+
+                            }
+                            else {
+                                connection.end();
+                            }
+                        })
 
                 }
 
@@ -72,4 +212,231 @@ function start() {
 
 }
 
+// ======================================================================
+// Hardware
+// ======================================================================
+
+function hardware() {
+
+    console.log("")
+    console.log("Items in Cart: " + cart.length + " | " + "Cart Total: " + "$" + cartTotal)
+    console.log("")
+
+    connection.query("SELECT * FROM products WHERE department=?", ["Hardware"], function (err, results) {
+        if (err) throw err;
+
+        inquirer
+            .prompt(
+                {
+                    name: "choice",
+                    type: "rawlist",
+                    choices: function () {
+                        let choiceArray = []
+                        for (let i = 0; i < results.length; i++) {
+                            choiceArray.push(results[i].product + " | " + "$" + results[i].price + " | " + "Available: " + results[i].stock)
+                        }
+                        choiceArray.push("Return")
+                        return choiceArray
+                    },
+                    message: "What would you like to purchase?"
+                }
+            )
+            .then(function (itemChoice) {
+
+                let product = itemChoice.choice.split(" | ")[0]
+                let price = parseInt(itemChoice.choice.split(" | ")[1].split("$")[1])
+
+                if (product == "Return") {
+                    start()
+                }
+                else {
+                    cartPrompt()
+                }
+
+                function cartPrompt() {
+
+                    inquirer.prompt(
+                        {
+                            name: "prompt",
+                            type: "list",
+                            message: "Are you sure you want to add this item?",
+                            choices: ["Yes", "No"]
+                        }
+                    )
+                        .then(function (answer) {
+
+                            if (answer.prompt === "Yes") {
+
+                                cart.push(product)
+                                cartTotal = cartTotal + price
+
+                                console.log("")
+                                console.log("Item added to cart!")
+                                start()
+
+                            }
+                            else {
+                                connection.end();
+                            }
+                        })
+
+                }
+
+            })
+
+    })
+
+}
+
+// ======================================================================
+// Games/Toys
+// ======================================================================
+
+function gamesToys() {
+
+    console.log("")
+    console.log("Items in Cart: " + cart.length + " | " + "Cart Total: " + "$" + cartTotal)
+    console.log("")
+
+    connection.query("SELECT * FROM products WHERE department=?", ["Games/Toys"], function (err, results) {
+        if (err) throw err;
+
+        inquirer
+            .prompt(
+                {
+                    name: "choice",
+                    type: "rawlist",
+                    choices: function () {
+                        let choiceArray = []
+                        for (let i = 0; i < results.length; i++) {
+                            choiceArray.push(results[i].product + " | " + "$" + results[i].price + " | " + "Available: " + results[i].stock)
+                        }
+                        choiceArray.push("Return")
+                        return choiceArray
+                    },
+                    message: "What would you like to purchase?"
+                }
+            )
+            .then(function (itemChoice) {
+
+                let product = itemChoice.choice.split(" | ")[0]
+                let price = parseInt(itemChoice.choice.split(" | ")[1].split("$")[1])
+
+                if (product == "Return") {
+                    start()
+                }
+                else {
+                    cartPrompt()
+                }
+
+                function cartPrompt() {
+
+                    inquirer.prompt(
+                        {
+                            name: "prompt",
+                            type: "list",
+                            message: "Are you sure you want to add this item?",
+                            choices: ["Yes", "No"]
+                        }
+                    )
+                        .then(function (answer) {
+
+                            if (answer.prompt === "Yes") {
+
+                                cart.push(product)
+                                cartTotal = cartTotal + price
+
+                                console.log("")
+                                console.log("Item added to cart!")
+                                start()
+
+                            }
+                            else {
+                                connection.end();
+                            }
+                        })
+
+                }
+
+            })
+
+    })
+
+}
+
+// ======================================================================
+// Sporting Goods
+// ======================================================================
+
+function sportingGoods() {
+
+    console.log("")
+    console.log("Items in Cart: " + cart.length + " | " + "Cart Total: " + "$" + cartTotal)
+    console.log("")
+
+    connection.query("SELECT * FROM products WHERE department=?", ["Sporting Goods"], function (err, results) {
+        if (err) throw err;
+
+        inquirer
+            .prompt(
+                {
+                    name: "choice",
+                    type: "rawlist",
+                    choices: function () {
+                        let choiceArray = []
+                        for (let i = 0; i < results.length; i++) {
+                            choiceArray.push(results[i].product + " | " + "$" + results[i].price + " | " + "Available: " + results[i].stock)
+                        }
+                        choiceArray.push("Return")
+                        return choiceArray
+                    },
+                    message: "What would you like to purchase?"
+                }
+            )
+            .then(function (itemChoice) {
+
+                let product = itemChoice.choice.split(" | ")[0]
+                let price = parseInt(itemChoice.choice.split(" | ")[1].split("$")[1])
+
+                if (product == "Return") {
+                    start()
+                }
+                else {
+                    cartPrompt()
+                }
+
+                function cartPrompt() {
+
+                    inquirer.prompt(
+                        {
+                            name: "prompt",
+                            type: "list",
+                            message: "Are you sure you want to add this item?",
+                            choices: ["Yes", "No"]
+                        }
+                    )
+                        .then(function (answer) {
+
+                            if (answer.prompt === "Yes") {
+
+                                cart.push(product)
+                                cartTotal = cartTotal + price
+
+                                console.log("")
+                                console.log("Item added to cart!")
+                                start()
+
+                            }
+                            else {
+                                connection.end();
+                            }
+                        })
+
+                }
+
+            })
+
+    })
+
+}
 
