@@ -19,31 +19,35 @@ connection.connect(function (err) {
     start();
 });
 
-let cart = []
+let cartItems = 0
 let cartTotal = 0
 
 
 
 function start() {
 
-// ======================================================================
-// Main Menu
-// ======================================================================
+    // ======================================================================
+    // Main Menu
+    // ======================================================================
 
     console.log("")
     console.log("Welcome to Bamazon!")
     console.log("")
-    console.log("Items in Cart: " + cart.length + " | " + "Cart Total: " + "$" + cartTotal)
+    //Show number of items in cart + cart dollar total
+    console.log("Items in Cart: " + cartItems + " | " + "Cart Total: " + "$" + cartTotal)
     console.log("")
 
+    // Choose Department
     inquirer
         .prompt({
             name: "dpt_list",
-            type: "rawlist",
-            choices: ["Electronics", "Hardware", "Games/Toys", "Sporting Goods", "Exit"],
-            message: "Please select a department to view items"
+            type: "list",
+            choices: ["Electronics", "Hardware", "Games/Toys", "Sporting Goods", "View Cart", "Exit"],
+            message: "Please select a department to view items for" + "\nor" + "\nSelect 'View Cart' to see items currently in your cart"
         })
         .then(function (dept) {
+
+            // Department Switch Statement
             let department = dept.dpt_list
             switch (department) {
                 case "Electronics":
@@ -58,25 +62,31 @@ function start() {
                 case "Sporting Goods":
                     deptMenu();
                     break;
+                case "View Cart":
+                    viewCart();
+                    break;
+                // If the customer choses 'Exit' end the connection
                 case "Exit":
                     console.log("Thank You for Coming! See You Soon!")
                     connection.end();
                     break;
             }
 
-// ======================================================================
-// Department Menu
-// ======================================================================
+
+            // ======================================================================
+            // Department Menu
+            // ======================================================================
 
             function deptMenu() {
 
                 console.log("")
-                console.log("Items in Cart: " + cart.length + " | " + "Cart Total: " + "$" + cartTotal)
+                console.log("Items in Cart: " + cartItems + " | " + "Cart Total: " + "$" + cartTotal)
                 console.log("")
 
                 connection.query("SELECT * FROM products WHERE department=?", [department], function (err, results) {
                     if (err) throw err;
 
+                    // Choose Item
                     inquirer
                         .prompt(
                             {
@@ -95,22 +105,28 @@ function start() {
                         )
                         .then(function (itemChoice) {
 
-                            if (itemChoice.choice == "Return") {
-                                start()
+                            // If the customer chooses 'Return' go back to Department Menu
+
+                            let chosenItem = itemChoice.choice
+
+                            if (chosenItem == "Return") {
+                                start();
                             }
+                            // If the customer chooses an item, open the cart prompt menu
                             else {
-                                cartPrompt()
+                                cartPrompt();
                             }
 
-// ======================================================================
-// Cart Prompt
-// ======================================================================
+                            // ======================================================================
+                            // Cart Prompt Menu
+                            // ======================================================================
 
                             function cartPrompt() {
 
-                                let product = itemChoice.choice.split(" | ")[0]
-                                let price = parseInt(itemChoice.choice.split(" | ")[1].split("$")[1])
+                                let product = chosenItem.split(" | ")[0]
+                                let price = parseInt(chosenItem.split(" | ")[1].split("$")[1])
 
+                                // Ask the customer if they want to add the chosen item to their cart
                                 inquirer.prompt(
                                     {
                                         name: "prompt",
@@ -121,16 +137,33 @@ function start() {
                                 )
                                     .then(function (answer) {
 
+                                        // If 'yes', add item to cart array and add item price to cart total, then return to main menu
                                         if (answer.prompt === "Yes") {
 
-                                            cart.push(product)
+                                            connection.query(
+                                                "INSERT INTO cart SET ?",
+                                                {
+                                                    product: product,
+                                                    price: price,
+                                                    quantity: 1
+                                                },
+                                                function (err, res) {
+                                                    if (err) throw err;
+                                                    console.log(res.affectedRows + " item added to cart!\n");
+                                                    // Call updateProduct AFTER the INSERT completes
+                                                    // updateProduct();
+                                                }
+                                            );
+
+                                            cartItems++
                                             cartTotal = cartTotal + price
 
                                             console.log("")
-                                            console.log("Item added to cart!")
+                                            console.log(product + " added to cart!")
                                             start()
 
                                         }
+                                        // If 'no' return to list of items in chosen department
                                         else {
                                             deptMenu();
                                         }
@@ -139,6 +172,39 @@ function start() {
                             }
 
                         })
+
+                })
+
+            }
+
+            function viewCart() {
+
+                connection.query("SELECT * FROM cart", function (err, results) {
+                    if (err) throw err;
+
+                    if (results.length === 0) {
+                        inquirer
+                            .prompt(
+                                {
+                                    name: "return",
+                                    type: "list",
+                                    choices: ["Return"],
+                                    message: "Cart Empty"
+                                }
+                            )
+                            .then(function (ret) {
+                                if (ret.return == "Return") {
+                                    start();
+                                }
+                            })
+                    }
+                    else {
+                        console.log("")
+                        console.log(results)
+                        console.log("")
+                        connection.end();
+                    }
+
 
                 })
 

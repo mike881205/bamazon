@@ -12,6 +12,14 @@ CREATE TABLE products(
   PRIMARY KEY (id)
 );
 
+CREATE TABLE cart(
+  id INT NOT NULL AUTO_INCREMENT,
+  product VARCHAR(100) DEFAULT "",
+  price DECIMAL(10,2) DEFAULT 0,
+  quantity INT DEFAULT 0,
+  PRIMARY KEY (id)
+);
+
 INSERT INTO products (product, department, price, stock)
 VALUES ('72" Flat Screen TV', "Electronics", 600.00, 6), ("VR Headset", "Electronics", 400.00, 9), ("Wireless Bluetooth Earbuds", "Electronics", 200.00, 12);
 
