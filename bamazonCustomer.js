@@ -27,6 +27,7 @@ let cartItems = 0;
 let cartTotal = 0;
 let product;
 let price;
+let stock;
 let department;
 let chosenItem;
 
@@ -121,6 +122,8 @@ function cartPrompt() {
 
     product = chosenItem.split(" | ")[0]
     price = parseInt(chosenItem.split(" | ")[1].split("$")[1])
+    stock = parseInt(chosenItem.split(" | ")[2].split("Available: ")[1])
+
 
     // Ask the customer if they want to add the chosen item to their cart
     inquirer.prompt(
@@ -136,15 +139,21 @@ function cartPrompt() {
             // If 'yes', add item to cart array and add item price to cart total, then return to main menu
             if (answer.prompt === "Yes") {
 
-                updateCart();
-
-                updateCartView();
-
-                console.log("");
-                console.log(product + " added to cart!");
-                console.log("")
-
-                deptMenu()
+                if (stock >= 1) {
+                    updateCart()
+                    updateCartView();
+                    removeStock()
+                    console.log("");
+                    console.log(product + " added to cart!");
+                    console.log("")
+                    deptMenu()
+                }
+                else {
+                    console.log("")
+                    console.log("You cannot add any more of this product")
+                    console.log("")
+                    deptMenu()
+                }
 
             }
             // If 'no' return to list of items in chosen department
@@ -241,4 +250,23 @@ function updateCart() {
             if (err) throw err;
         }
     );
+}
+
+function removeStock() {
+
+    connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+            {
+                stock: stock - 1
+            },
+            {
+                product: product
+            }
+        ],
+        function (err, results) {
+            if (err) throw err;
+            console.log("")
+        })
+
 }
