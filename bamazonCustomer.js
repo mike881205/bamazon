@@ -22,8 +22,6 @@ connection.connect(function (err) {
 let cartItems = 0
 let cartTotal = 0
 
-
-
 function start() {
 
     // ======================================================================
@@ -49,29 +47,17 @@ function start() {
 
             // Department Switch Statement
             let department = dept.dpt_list
-            switch (department) {
-                case "Electronics":
-                    deptMenu();
-                    break;
-                case "Hardware":
-                    deptMenu();
-                    break;
-                case "Games/Toys":
-                    deptMenu();
-                    break;
-                case "Sporting Goods":
-                    deptMenu();
-                    break;
-                case "View Cart":
-                    viewCart();
-                    break;
-                // If the customer choses 'Exit' end the connection
-                case "Exit":
-                    console.log("Thank You for Coming! See You Soon!")
-                    connection.end();
-                    break;
-            }
 
+            if (department == "View Cart") {
+                viewCart()
+            }
+            else if (department == "Exit") {
+                console.log("Thank You for Coming! See You Soon!")
+                connection.end();
+            }
+            else {
+                deptMenu()
+            }
 
             // ======================================================================
             // Department Menu
@@ -149,7 +135,7 @@ function start() {
                                                 },
                                                 function (err, res) {
                                                     if (err) throw err;
-                                                    console.log(res.affectedRows + " item added to cart!\n");
+                                                    console.log(product + " added to cart!");
                                                     // Call updateProduct AFTER the INSERT completes
                                                     // updateProduct();
                                                 }
@@ -157,9 +143,6 @@ function start() {
 
                                             cartItems++
                                             cartTotal = cartTotal + price
-
-                                            console.log("")
-                                            console.log(product + " added to cart!")
                                             start()
 
                                         }
