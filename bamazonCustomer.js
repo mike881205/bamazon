@@ -23,11 +23,12 @@ connection.connect(function (err) {
     start();
 });
 
-let cartItems = 0;
-let cartTotal = 0;
+let cartItems;
+let cartTotal;
 let product;
 let price;
 let stock;
+let quantity;
 let department;
 let chosenItem;
 
@@ -53,7 +54,7 @@ function start() {
             department = dept.dpt_list
 
             if (department == "View Cart") {
-                viewCart()
+                viewNodeCart()
             }
             else if (department == "Exit") {
                 console.log("Thank You for Coming! See You Soon!")
@@ -138,14 +139,12 @@ function cartPrompt() {
 
             // If 'yes', add item to cart array and add item price to cart total, then return to main menu
             if (answer.prompt === "Yes") {
-
                 if (stock >= 1) {
-                    updateCart()
-                    updateCartView();
-                    removeStock()
+                    updateSQLcart();
+                    removeSQLstock();
+                    updateNodeCart();
                     console.log("");
                     console.log(product + " added to cart!");
-                    console.log("")
                     deptMenu()
                 }
                 else {
@@ -165,54 +164,53 @@ function cartPrompt() {
 }
 
 // ======================================================================
-// View Cart Menu
+// Update SQL Cart
 // ======================================================================
 
-function viewCart() {
+function updateSQLcart() {
 
-    connection.query("SELECT * FROM cart", function (err, results) {
-
-        if (err) throw err;
-
-        console.log("")
-        console.log("Items in Cart: " + cartItems + " | " + "Cart Total: " + "$" + cartTotal)
-        console.log("")
-
-        if (results.length === 0) {
-            inquirer
-                .prompt(
-                    {
-                        name: "return",
-                        type: "list",
-                        choices: ["Return"],
-                        message: "Cart Empty"
-                    }
-                )
-                .then(function (ret) {
-                    if (ret.return == "Return") {
-                        start();
-                    }
-                })
+    connection.query(
+        "INSERT INTO cart SET ?",
+        {
+            product: product,
+            price: price,
+            quantity: 1
+        },
+        function (err, res) {
+            if (err) throw err;
         }
-        else {
-
-            for (let i = 0; i < results.length; i++) {
-                console.log(results[i].product + " | " + "$" + results[i].price + " | " + "Quantity: " + results[i].quantity)
-            }
-            console.log("")
-            connection.end();
-        }
-
-
-    })
+    );
 
 }
 
 // ======================================================================
-// Update Cart Numbers
+// Remove stock from SQL product
 // ======================================================================
 
-function updateCartView() {
+function removeSQLstock() {
+
+    connection.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+            {
+                stock: stock - 1
+            },
+            {
+                product: product
+            }
+        ],
+        function (err, results) {
+            if (err) throw err;
+            console.log("")
+        })
+
+}
+
+// ======================================================================
+// Update Node Cart
+// ======================================================================
+
+function updateNodeCart() {
     connection.query("SELECT * FROM cart", function (err, results) {
         if (err) throw err;
 
@@ -235,38 +233,101 @@ function updateCartView() {
 }
 
 // ======================================================================
-// Update SQL Cart
+// View Cart Menu
 // ======================================================================
 
-function updateCart() {
-    connection.query(
-        "INSERT INTO cart SET ?",
-        {
-            product: product,
-            price: price,
-            quantity: 1
-        },
-        function (err, res) {
-            if (err) throw err;
+function viewNodeCart() {
+
+    connection.query("SELECT * FROM cart", function (err, results) {
+        if (err) throw err;
+
+        if (results.length === 0) {
+            inquirer
+                .prompt(
+                    {
+                        name: "return",
+                        type: "list",
+                        choices: ["Return"],
+                        message: "Cart Empty"
+                    }
+                )
+                .then(function (ret) {
+                    if (ret.return == "Return") {
+                        start();
+                    }
+                })
         }
-    );
+        else {
+            console.log("")
+            console.log("Items in Cart: " + cartItems + " | " + "Cart Total: " + "$" + cartTotal)
+            console.log("")
+
+            for (let i = 0; i < results.length; i++) {
+                console.log(results[i].product + " | " + "$" + results[i].price + " | " + "Quantity: " + results[i].quantity)
+            }
+            console.log("")
+        }
+
+        inquirer.prompt(
+            {
+                name: "prompt",
+                type: "list",
+                message: "Would you like to checkout or keep shopping?",
+                choices: ["Checkout", "Keep Shopping"]
+            }
+        )
+            .then(function (answer) {
+                if (answer.prompt == "Keep Shopping") {
+                    start();
+                }
+                else {
+                    checkoutMenu();
+                }
+            })
+
+    })
+
 }
 
-function removeStock() {
+// ======================================================================
+// View Checkout Menu
+// ======================================================================
 
-    connection.query(
-        "UPDATE products SET ? WHERE ?",
-        [
+function checkoutMenu() {
+
+    connection.query("SELECT * FROM cart", function (err, results) {
+        if (err) throw err;
+
+        console.log("")
+        console.log("Items in Cart: " + cartItems + " | " + "Cart Total: " + "$" + cartTotal)
+        console.log("")
+
+        for (let i = 0; i < results.length; i++) {
+            console.log(results[i].product + " | " + "$" + results[i].price + " | " + "Quantity: " + results[i].quantity)
+        }
+        console.log("")
+
+        inquirer.prompt(
             {
-                stock: stock - 1
-            },
-            {
-                product: product
+                name: "checkout",
+                type: "list",
+                message: "",
+                choices: ["Complete Order", "Return"]
             }
-        ],
-        function (err, results) {
-            if (err) throw err;
-            console.log("")
-        })
+        )
+            .then(function (checkout) {
+                if (checkout.checkout == "Return") {
+                    start();
+                }
+                else {
+                    console.log("Thank you for your purchase! Please come again!")
+                    connection.end();
+                }
+            })
+    })
 
+}
+
+function resetDB() {
+    
 }

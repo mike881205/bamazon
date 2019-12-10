@@ -1,1 +1,1 @@
-update cart qty # and cart cost
+add reset function
