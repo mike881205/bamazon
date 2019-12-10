@@ -38,6 +38,17 @@ let chosenItem;
 
 function start() {
 
+    if (cartItems == undefined) {
+        console.log("")
+        console.log("Items in Cart: " + 0 + " | " + "Cart Total: " + "$" + 0)
+        console.log("")
+    }
+    else {
+        console.log("")
+        console.log("Items in Cart: " + cartItems + " | " + "Cart Total: " + "$" + cartTotal)
+        console.log("")
+    }
+
     // Choose Department
     inquirer
         .prompt(
@@ -45,7 +56,7 @@ function start() {
                 name: "dpt_list",
                 type: "list",
                 choices: ["Electronics", "Hardware", "Games/Toys", "Sporting Goods", "View Cart", "Exit"],
-                message: "Please select a department to view items for" + "\nor" + "\nSelect 'View Cart' to see items currently in your cart"
+                message: "\n" + "Please select a department to view items for sale" + "\nor" + "\nSelect 'View Cart' to see items currently in your cart" + "\n"
             }
         )
         .then(function (dept) {
@@ -95,7 +106,7 @@ function deptMenu() {
                         choiceArray.push("Return")
                         return choiceArray
                     },
-                    message: "What would you like to purchase?"
+                    message: "\n" + "What would you like to purchase?" + "\n"
                 }
             )
             .then(function (itemChoice) {
@@ -131,7 +142,7 @@ function cartPrompt() {
         {
             name: "prompt",
             type: "list",
-            message: "Are you sure you want to add this item?",
+            message: "\n" + "Are you sure you want to add this item?" + "\n",
             choices: ["Yes", "No"]
         }
     )
@@ -329,5 +340,5 @@ function checkoutMenu() {
 }
 
 function resetDB() {
-    
+
 }
