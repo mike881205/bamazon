@@ -277,24 +277,25 @@ function viewNodeCart() {
                 console.log(results[i].product + " | " + "$" + results[i].price + " | " + "Quantity: " + results[i].quantity)
             }
             console.log("")
-        }
 
-        inquirer.prompt(
-            {
-                name: "prompt",
-                type: "list",
-                message: "Would you like to checkout or keep shopping?",
-                choices: ["Checkout", "Keep Shopping"]
-            }
-        )
-            .then(function (answer) {
-                if (answer.prompt == "Keep Shopping") {
-                    start();
+            inquirer.prompt(
+                {
+                    name: "prompt",
+                    type: "list",
+                    message: "Would you like to checkout or keep shopping?",
+                    choices: ["Checkout", "Keep Shopping"]
                 }
-                else {
-                    checkoutMenu();
-                }
-            })
+            )
+                .then(function (answer) {
+                    if (answer.prompt == "Keep Shopping") {
+                        start();
+                    }
+                    else {
+                        checkoutMenu();
+                    }
+                })
+
+        }
 
     })
 
