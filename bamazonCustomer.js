@@ -333,6 +333,7 @@ function checkoutMenu() {
                 }
                 else {
                     console.log("Thank you for your purchase! Please come again!")
+                    resetDB();
                     connection.end();
                 }
             })
@@ -342,4 +343,126 @@ function checkoutMenu() {
 
 function resetDB() {
 
+    const products = [
+        // Electronics
+        [
+            {
+                stock: 6
+            },
+            {
+                product: '72" Flat Screen TV'
+            }
+        ],
+        [
+            {
+                stock: 9
+            },
+            {
+                product: "VR Headset"
+            }
+        ],
+        [
+            {
+                stock: 12
+            },
+            {
+                product: "Wireless Bluetooth Earbuds"
+            }
+        ],
+
+        // Hardware
+        [
+            {
+                stock: 8
+            },
+            {
+                product: "Cordless Power Drill"
+            }
+        ],
+        [
+            {
+                stock: 12
+            },
+            {
+                product: "Ratchet Set"
+            }
+        ],
+        [
+            {
+                stock: 4
+            },
+            {
+                product: "Table Saw"
+            }
+        ],
+
+        // Games/Toys
+        [
+            {
+                stock: 20
+            },
+            {
+                product: "'Monopolize' Board Game"
+            }
+        ],
+        [
+            {
+                stock: 30
+            },
+            {
+                product: "'Bug-Man' Action Figure"
+            }
+        ],
+        [
+            {
+                stock: 40
+            },
+            {
+                product: "'Space Battles' Starfighter Model Kit"
+            }
+        ],
+
+        // Sporting Goods
+        [
+            {
+                stock: 5
+            },
+            {
+                product: "Mountain Bike"
+            }
+        ],
+        [
+            {
+                stock: 7
+            },
+            {
+                product: "Hockey Goalie Mask"
+            }
+        ],
+        [
+            {
+                stock: 9
+            },
+            {
+                product: "Golf Club Bag"
+            }
+        ],
+    ]
+
+   for (let i = 0; i < products.length; i++) {
+    connection.query(
+        "UPDATE products SET ? WHERE ?",
+
+        products[i],
+
+        function (err, results) {
+            if (err) throw err;
+        })
+   }
+
+   console.log("")
+   console.log("")
+   console.log("")
+   console.log("DB Reset")
+    
 }
