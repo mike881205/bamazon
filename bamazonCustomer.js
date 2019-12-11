@@ -30,6 +30,7 @@ let price;
 let stock;
 let quantity;
 let department;
+let SQLdepartment;
 let chosenItem;
 
 // ======================================================================
@@ -102,6 +103,7 @@ function deptMenu() {
                         let choiceArray = []
                         for (let i = 0; i < results.length; i++) {
                             choiceArray.push(results[i].product + " | " + "$" + results[i].price + " | " + "Available: " + results[i].stock)
+                            department = results[i].department
                         }
                         choiceArray.push("Return")
                         return choiceArray
@@ -135,7 +137,7 @@ function cartPrompt() {
     product = chosenItem.split(" | ")[0]
     price = parseInt(chosenItem.split(" | ")[1].split("$")[1])
     stock = parseInt(chosenItem.split(" | ")[2].split("Available: ")[1])
-
+    // SQLdepartment = chosenItem.split(" | ")[3]
 
     // Ask the customer if they want to add the chosen item to their cart
     inquirer.prompt(
@@ -185,7 +187,8 @@ function updateSQLcart() {
         {
             product: product,
             price: price,
-            quantity: 1
+            quantity: 1,
+            department: department
         },
         function (err, res) {
             if (err) throw err;
@@ -332,6 +335,7 @@ function checkoutMenu() {
                     start();
                 }
                 else {
+                    console.log("")
                     console.log("Thank you for your purchase! Please come again!")
                     resetDB();
                     connection.end();
@@ -343,7 +347,7 @@ function checkoutMenu() {
 
 function resetDB() {
 
-    const products = [
+    const resetProducts = [
         // Electronics
         [
             {
@@ -449,20 +453,49 @@ function resetDB() {
         ],
     ]
 
-   for (let i = 0; i < products.length; i++) {
-    connection.query(
-        "UPDATE products SET ? WHERE ?",
+    for (let i = 0; i < resetProducts.length; i++) {
+        connection.query(
+            "UPDATE products SET ? WHERE ?",
 
-        products[i],
+            resetProducts[i],
 
-        function (err, results) {
-            if (err) throw err;
-        })
-   }
+            function (err, results) {
+                if (err) throw err;
+            })
+    }
 
-   console.log("")
-   console.log("")
-   console.log("")
-   console.log("DB Reset")
-    
+    // Remove all items from cart
+
+    const resetCart = [
+        {
+            department: "Electronics"
+        },
+        {
+            department: "Hardware"
+        },
+        {
+            department: "Games/Toys"
+        },
+        {
+            department: "Sporting Goods"
+        },
+    ]
+
+    for (let i = 0; i < resetCart.length; i++) {
+        connection.query(
+            "DELETE FROM cart WHERE ?",
+
+            resetCart[i],
+
+            function (err, res) {
+                if (err) throw err;
+            }
+        );
+    }
+
+    console.log("")
+    console.log("")
+    console.log("")
+    console.log("DB Reset")
+
 }

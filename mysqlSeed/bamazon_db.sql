@@ -17,6 +17,7 @@ CREATE TABLE cart(
   product VARCHAR(100) DEFAULT "",
   price DECIMAL(10,2) DEFAULT 0,
   quantity INT DEFAULT 0,
+  department VARCHAR(100) DEFAULT "",
   PRIMARY KEY (id)
 );
 
