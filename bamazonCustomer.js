@@ -535,7 +535,7 @@ function checkoutMenu() {
             {
                 name: "checkout",
                 type: "list",
-                message: "",
+                message: "Would you like to purchase these items?",
                 choices: ["Complete Order", "Return"]
             }
         )
