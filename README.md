@@ -165,4 +165,8 @@ If the customer chooses 'view cart' from the main menu they will be shown a list
 
 * I am responsbile for creating all logic and writing all code within all files of this app
 
-* I was not able to write the code asking the customer how many units of the chosen item they would like to add to their cart. I was also not able to update the SQL cart so that only the quantitiy for the chosen item updates when the item is added. When a customer adds the same item it will add all of the information to the SQL cart table. I plan to refine this code in the future.
+## Issues
+
+* I was not able to write the code asking the customer how many units of the chosen item they would like to add to their cart. 
+* I was also not able to update the SQL cart so that only the quantitiy for the chosen item updates when the item is added. When a customer adds the same item it will add all of the information to the SQL cart table. I plan to refine this code in the future.
+* When the user chooses to remove an item, if the selected item has more that one (1) entry in the SQL cart, all of the items matching that product name will be removed.
