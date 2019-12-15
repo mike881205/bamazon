@@ -156,6 +156,8 @@ If the customer chooses 'view cart' from the main menu they will be shown a list
 
 ## [GitHUb Repo](https://github.com/mike881205/bamazon)
 
+[Demo Video](demo-vids/main_functionality.mp4)
+
 ## Technologies used within the App
 
 * mysql node module
@@ -166,6 +168,8 @@ If the customer chooses 'view cart' from the main menu they will be shown a list
 * I am responsbile for creating all logic and writing all code within all files of this app
 
 ## Issues
+
+[Issues](demo-vids/issues.mp4)
 
 * I was not able to write the code asking the customer how many units of the chosen item they would like to add to their cart. 
 * I was also not able to update the SQL cart so that only the quantitiy for the chosen item updates when the item is added. When a customer adds the same item it will add all of the information to the SQL cart table. I plan to refine this code in the future.
